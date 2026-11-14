@@ -161,7 +161,8 @@ class IslandService : AccessibilityService(), LifecycleOwner, SavedStateRegistry
 
     private val power = object : BroadcastReceiver() {
         override fun onReceive(c: Context, i: Intent) {
-            if (i.action == Intent.ACTION_POWER_CONNECTED) {
+            // Most phones already show their own charging animation; only show ours if the user enables it.
+            if (i.action == Intent.ACTION_POWER_CONNECTED && GlassApp.instance.prefs.islandCharging) {
                 val b = c.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
                 val l = b?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) ?: -1
                 val s = b?.getIntExtra(BatteryManager.EXTRA_SCALE, 100) ?: 100

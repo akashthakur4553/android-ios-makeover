@@ -133,6 +133,7 @@ class SettingsActivity : ComponentActivity() {
                             startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS))
                         }
                         Toggle(Icons.Rounded.TouchApp, Ios.Blue, "Top-right swipe → Control Centre", prefs.cornerControlCentre) { prefs.cornerControlCentre = it }
+                        Toggle(Icons.Rounded.Vibration, Ios.Green, "Show charging in Dynamic Island", prefs.islandCharging) { prefs.islandCharging = it }
                         Toggle(Icons.Rounded.Notifications, Ios.Red, "iPhone-style notification banners", prefs.islandBanners) {
                             prefs.islandBanners = it
                             runCatching { Settings.Global.putInt(contentResolver, "heads_up_notifications_enabled", if (it) 0 else 1) }

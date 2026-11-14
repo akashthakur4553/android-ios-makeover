@@ -15,6 +15,7 @@ class Prefs(ctx: Context) {
     var islandEnabled by bool("island", true)
     var cornerControlCentre by bool("cornerCC", true)
     var islandBanners by bool("banners", true)
+    var islandCharging by bool("islandCharging", false)
     var followSystemWallpaper by bool("followWp", true)
     var haptics by bool("haptics", true)
     var onboarded by bool("onboarded", false)
