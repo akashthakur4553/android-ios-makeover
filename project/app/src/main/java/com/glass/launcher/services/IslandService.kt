@@ -159,6 +159,11 @@ class IslandService : AccessibilityService(), LifecycleOwner, SavedStateRegistry
         else -> Mode.Idle
     }
 
+    /** Screen off -> get the Glass lock screen ready so it's there the moment the screen wakes. */
+    private val screen = object : BroadcastReceiver() {
+        override fun onReceive(c: Context, i: Intent) { com.glass.launcher.LockActivity.prepare(this@IslandService) }
+    }
+
     private val power = object : BroadcastReceiver() {
         override fun onReceive(c: Context, i: Intent) {
             // Most phones already show their own charging animation; only show ours if the user enables it.
@@ -395,6 +400,7 @@ class IslandService : AccessibilityService(), LifecycleOwner, SavedStateRegistry
         hideCover()
         setSystemHeadsUp(true)
         runCatching { unregisterReceiver(power) }
+        runCatching { unregisterReceiver(screen) }
         islandView?.let { runCatching { wm.removeViewImmediate(it) } }; islandView = null
         corners.forEach { runCatching { wm.removeViewImmediate(it) } }; corners.clear()
     }

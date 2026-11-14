@@ -82,6 +82,17 @@
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Glass.Overlay" />
 
+        <!-- iPhone-style lock screen, shown over the real keyguard -->
+        <activity
+            android:name=".LockActivity"
+            android:exported="false"
+            android:launchMode="singleInstance"
+            android:taskAffinity="com.glass.launcher.lock"
+            android:excludeFromRecents="true"
+            android:showWhenLocked="true"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.Glass.Home" />
+
         <!-- iPhone-style app switcher (covers the stock recents screen) -->
         <activity
             android:name=".SwitcherActivity"

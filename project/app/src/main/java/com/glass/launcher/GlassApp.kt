@@ -41,6 +41,10 @@ class GlassApp : Application() {
         wallpaper = WallpaperStore(this, scope)
         weather = WeatherRepo(this, scope)
         media = MediaHub(this)
+        // Screen off -> prepare the iPhone-style lock screen (launcher process is always alive).
+        registerReceiver(object : android.content.BroadcastReceiver() {
+            override fun onReceive(c: android.content.Context?, i: Intent?) { LockActivity.prepare(this@GlassApp) }
+        }, android.content.IntentFilter(Intent.ACTION_SCREEN_OFF))
     }
 
     /**

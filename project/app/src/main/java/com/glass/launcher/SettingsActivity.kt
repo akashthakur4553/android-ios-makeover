@@ -45,6 +45,7 @@ import androidx.compose.material.icons.rounded.TouchApp
 import androidx.compose.material.icons.rounded.Vibration
 import androidx.compose.material.icons.rounded.Wallpaper
 import androidx.compose.material.icons.rounded.Shield
+import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -134,6 +135,7 @@ class SettingsActivity : ComponentActivity() {
                         }
                         Toggle(Icons.Rounded.TouchApp, Ios.Blue, "Top-right swipe → Control Centre", prefs.cornerControlCentre) { prefs.cornerControlCentre = it }
                         Toggle(Icons.Rounded.Vibration, Ios.Green, "Show charging in Dynamic Island", prefs.islandCharging) { prefs.islandCharging = it }
+                        Toggle(Icons.Rounded.Lock, Ios.Blue, "iPhone-style Lock Screen", prefs.lockScreen) { prefs.lockScreen = it }
                         Toggle(Icons.Rounded.Notifications, Ios.Red, "iPhone-style notification banners", prefs.islandBanners) {
                             prefs.islandBanners = it
                             runCatching { Settings.Global.putInt(contentResolver, "heads_up_notifications_enabled", if (it) 0 else 1) }
