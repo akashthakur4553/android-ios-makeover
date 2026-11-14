@@ -23,6 +23,10 @@
 
   // ------------------------------------------------------------------ renderer / scene
   const host = window.BUDDY_HOST || document.body;
+  // Director mode (videos): no clocks, no rAF, seeded randomness -> every frame reproducible from time alone.
+  const MANUAL = !!window.BUDDY_MANUAL;
+  let seed = 1234567;
+  const rand = () => MANUAL ? (seed = (seed * 16807) % 2147483647) / 2147483647 : Math.random();
   const isBody = host === document.body;
   const W = () => (isBody ? innerWidth : host.clientWidth) || innerWidth, Hh = () => (isBody ? innerHeight : host.clientHeight) || innerHeight;
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
@@ -460,7 +464,7 @@
     think: { loop: true, face: { eye: 'normal', mouth: 'cat', lookX: 0.8, lookY: -0.9, brow: -0.2, browUp: 0.6 }, fn(t, p, w) {
       add(p, 'armR', -1.25, 0, 0.25, w); add(p, 'elbowR', -2.05, 0.3, 0, w); add(p, 'handR', 0.2, 0, 0, w);
       add(p, 'head', -0.05, 0.15, 0.18, w); add(p, 'footL', Math.max(0, Math.sin(t * 6)) * -0.25, 0, 0, w);
-      if (Math.random() < 0.012) emit('❓', headTop(0.2), [0, 0.4, 0], 1.2, 0.35); } },
+      if (rand() < 0.012) emit('❓', headTop(0.2), [0, 0.4, 0], 1.2, 0.35); } },
     listen: { loop: true, face: { eye: 'normal', mouth: 'smile', browUp: 0.5, blush: 0.4 }, fn(t, p, w) {
       add(p, 'armL', -0.6, 0, 1.6, w); add(p, 'elbowL', -1.9, 0, 0, w); // hand to ear
       add(p, 'head', 0.02, -0.15, -0.18, w); add(p, 'spine', 0, 0, -0.05, w); } },
@@ -479,27 +483,27 @@
       else if (part === 1) { add(p, 'armL', -1.4, 0, 0.3, w); add(p, 'elbowL', -1.6 + s * 0.6, 0, 0, w); add(p, 'armR', -1.4, 0, -0.3, w); add(p, 'elbowR', -1.6 - s * 0.6, 0, 0, w); }
       else if (part === 2) { add(p, 'armL', s * 0.9, 0, 0.9, w); add(p, 'armR', -s * 0.9, 0, -0.9, w); add(p, 'root', 0, s * 0.6, 0, w); }
       else { add(p, 'armR', -0.3, 0, -2.7 + Math.sin(b * 2) * 0.25, w); add(p, 'armL', 0, 0, 0.9, w); add(p, 'elbowL', -1.4, 0, 0, w); }
-      if (Math.random() < 0.05) emit(Math.random() < 0.5 ? '🎵' : '🎶', headTop(0.15).add(new THREE.Vector3((Math.random() - 0.5) * 1.4, 0, 0)), [0, 0.7, 0], 1.4, 0.35); } },
+      if (rand() < 0.05) emit(rand() < 0.5 ? '🎵' : '🎶', headTop(0.15).add(new THREE.Vector3((rand() - 0.5) * 1.4, 0, 0)), [0, 0.7, 0], 1.4, 0.35); } },
     laugh: { dur: 2.8, face: { eye: 'happy', mouth: 'grin', open: 1, blush: 0.8 }, fn(t, p, w) {
       const k = pulse(t, 0, 2.5), sh = Math.sin(t * 28) * 0.05;
       add(p, 'head', -0.28 + sh, 0, sh, k * w); add(p, 'chest', -0.08, 0, sh * 0.8, k * w); p.hipY += Math.abs(Math.sin(t * 14)) * 0.025 * k * w;
       add(p, 'armL', -0.7, 0, 0.3, k * w); add(p, 'elbowL', -1.5, 0, 0, k * w); add(p, 'armR', -0.6, 0, -0.35, k * w); add(p, 'elbowR', -1.5, 0, 0, k * w);
-      if (Math.random() < 0.06) emit('😆', headTop(0.25).add(new THREE.Vector3((Math.random() - 0.5), 0, 0)), [0, 0.5, 0], 1.1, 0.3); } },
+      if (rand() < 0.06) emit('😆', headTop(0.25).add(new THREE.Vector3((rand() - 0.5), 0, 0)), [0, 0.5, 0], 1.1, 0.3); } },
     cry: { dur: 3.8, face: { eye: 'cry', mouth: 'wavy', open: 0.4, brow: -1, tears: 1, blush: 0.5 }, fn(t, p, w) {
       const k = pulse(t, 0, 3.5), sob = Math.sin(t * 9) * 0.05;
       add(p, 'head', 0.28 + sob, 0, 0, k * w); add(p, 'spine', 0.12, 0, 0, k * w); add(p, 'chest', sob, 0, 0, k * w);
       add(p, 'armL', -2.0, 0, -0.5, k * w); add(p, 'elbowL', -1.7, 0, 0, k * w); add(p, 'armR', -2.0, 0, 0.5, k * w); add(p, 'elbowR', -1.7, 0, 0, k * w);
-      if (Math.random() < 0.18) { const e = eyeWorld(Math.random() < 0.5 ? 0 : 1); emit('💧', e, [(Math.random() - 0.5) * 0.6, 0.3, 0.4], 0.9, 0.16, -2.2); } } },
+      if (rand() < 0.18) { const e = eyeWorld(rand() < 0.5 ? 0 : 1); emit('💧', e, [(rand() - 0.5) * 0.6, 0.3, 0.4], 0.9, 0.16, -2.2); } } },
     sad: { dur: 3.5, face: { eye: 'sad', mouth: 'frown', brow: -1, blush: 0.15, lookY: 0.7 }, fn(t, p, w) {
       const k = pulse(t, 0, 3.2);
       add(p, 'spine', 0.22, 0, 0, k * w); add(p, 'head', 0.35, 0, Math.sin(t * 1.5) * 0.06, k * w); p.hipY -= 0.03 * k * w;
       add(p, 'armL', 0.1, 0, -0.1, k * w); add(p, 'armR', 0.1, 0, 0.1, k * w); add(p, 'legR', 0, 0.3, 0, k * w);
-      if (t < 0.1) emit('☁️', headTop(0.45), [0, 0.05, 0], 3.0, 0.55, 0); if (Math.random() < 0.08 && t < 3) emit('💧', headTop(0.25).add(new THREE.Vector3((Math.random() - 0.5) * 0.5, 0, 0)), [0, -0.6, 0], 0.7, 0.1, -1); } },
+      if (t < 0.1) emit('☁️', headTop(0.45), [0, 0.05, 0], 3.0, 0.55, 0); if (rand() < 0.08 && t < 3) emit('💧', headTop(0.25).add(new THREE.Vector3((rand() - 0.5) * 0.5, 0, 0)), [0, -0.6, 0], 0.7, 0.1, -1); } },
     angry: { dur: 2.8, face: { eye: 'angry', mouth: 'flat', brow: 1.2, blush: 0.9 }, fn(t, p, w) {
       const k = pulse(t, 0, 2.5), stomp = Math.max(0, Math.sin(t * 9));
       add(p, 'armL', 0.2, 0, 0.35, k * w); add(p, 'armR', 0.2, 0, -0.35, k * w); add(p, 'elbowL', -0.3, 0, 0, k * w); add(p, 'elbowR', -0.3, 0, 0, k * w);
       add(p, t % 0.7 < 0.35 ? 'legL' : 'legR', -stomp * 0.5, 0, 0, k * w); add(p, 'head', 0.1, Math.sin(t * 16) * 0.12, 0, k * w);
-      if (Math.random() < 0.05) emit('💢', headTop(0.25).add(new THREE.Vector3(0.35, 0, 0)), [0, 0.3, 0], 0.8, 0.35); } },
+      if (rand() < 0.05) emit('💢', headTop(0.25).add(new THREE.Vector3(0.35, 0, 0)), [0, 0.3, 0], 0.8, 0.35); } },
     surprised: { dur: 1.8, face: { eye: 'wide', mouth: 'o', open: 0.8, browUp: 1.3, blush: 0.3 }, fn(t, p, w) {
       const k = pulse(t, 0, 1.5), hop = t < 0.35 ? Math.sin(t / 0.35 * Math.PI) : 0;
       p.pos[1] += hop * 0.25 * w; p.pos[2] -= 0.15 * k * w;
@@ -509,7 +513,7 @@
       const k = pulse(t, 0, 2.5);
       add(p, 'armL', -1.0, 0, -0.55, k * w); add(p, 'elbowL', -1.3, 0.5, 0, k * w); add(p, 'armR', -1.0, 0, 0.55, k * w); add(p, 'elbowR', -1.3, -0.5, 0, k * w);
       add(p, 'hips', 0, Math.sin(t * 3) * 0.2, 0, k * w); add(p, 'head', 0, 0, Math.sin(t * 3) * 0.12, k * w);
-      if (Math.random() < 0.1) emit('💖', headTop(0).add(new THREE.Vector3((Math.random() - 0.5) * 1.2, -0.2, 0.2)), [0, 0.7, 0], 1.3, 0.3); } },
+      if (rand() < 0.1) emit('💖', headTop(0).add(new THREE.Vector3((rand() - 0.5) * 1.2, -0.2, 0.2)), [0, 0.7, 0], 1.3, 0.3); } },
     shy: { dur: 2.8, face: { eye: 'normal', mouth: 'cat', blush: 1, lookX: -0.8, lookY: 0.6 }, fn(t, p, w) {
       const k = pulse(t, 0, 2.5);
       add(p, 'armL', 0.5, 0, -0.1, k * w); add(p, 'armR', 0.5, 0, 0.1, k * w); add(p, 'elbowL', -0.4, 0, 0, k * w); add(p, 'elbowR', -0.4, 0, 0, k * w);
@@ -518,12 +522,12 @@
       const k = pulse(t, 0, 3.2), yawn = pulse(t, 0.3, 1.4);
       add(p, 'head', 0.3 - yawn * 0.5, 0, 0.2, k * w); add(p, 'armR', -0.9 * yawn, 0, -0.2, w); add(p, 'elbowR', -2.0 * yawn, 0, 0, w);
       face.open = Math.max(face.open, yawn);
-      if (Math.random() < 0.04) emit('💤', headTop(0.2).add(new THREE.Vector3(0.35, 0, 0)), [0.15, 0.4, 0], 1.6, 0.35, 0); } },
+      if (rand() < 0.04) emit('💤', headTop(0.2).add(new THREE.Vector3(0.35, 0, 0)), [0.15, 0.4, 0], 1.6, 0.35, 0); } },
     clap: { dur: 2.2, face: { eye: 'happy', mouth: 'grin', blush: 0.6 }, fn(t, p, w) {
       const k = pulse(t, 0, 1.9), c = (Math.sin(t * 16) + 1) / 2;
       add(p, 'armL', -1.25, 0, -0.35 * c, k * w); add(p, 'armR', -1.25, 0, 0.35 * c, k * w); add(p, 'elbowL', -0.9, 0.4, 0, k * w); add(p, 'elbowR', -0.9, -0.4, 0, k * w);
       p.hipY += Math.abs(Math.sin(t * 8)) * 0.03 * k * w;
-      if (Math.random() < 0.06) emit('👏', headTop(-0.2), [0, 0.5, 0.2], 0.8, 0.3); } },
+      if (rand() < 0.06) emit('👏', headTop(-0.2), [0, 0.5, 0.2], 0.8, 0.3); } },
     thumbsup: { dur: 2.2, face: { eye: 'happy', wink: true, mouth: 'grin', blush: 0.5 }, fn(t, p, w) {
       const k = pulse(t, 0, 1.9);
       add(p, 'armR', -1.3, 0, -0.3, k * w); add(p, 'elbowR', -0.9, 0, 0, k * w); add(p, 'head', 0, 0, -0.12, k * w);
@@ -532,15 +536,15 @@
     no: { dur: 1.4, face: { eye: 'normal', mouth: 'flat', brow: -0.4 }, fn(t, p, w) { add(p, 'head', 0, Math.sin(t * 13) * 0.3 * (1 - t / 1.4), 0, w); } },
     spin: { dur: 1.6, face: { eye: 'happy', mouth: 'grin', blush: 0.5 }, fn(t, p, w) {
       add(p, 'root', 0, ease(t / 1.2) * Math.PI * 2, 0, w); add(p, 'armL', 0, 0, 1.3, w); add(p, 'armR', 0, 0, -1.3, w); p.pos[1] += Math.sin(Math.min(1, t / 1.2) * Math.PI) * 0.2 * w;
-      if (Math.random() < 0.1) emit('✨', headTop(-0.3).add(new THREE.Vector3((Math.random() - 0.5) * 1.2, 0, 0)), [0, 0.3, 0], 0.9, 0.25); } },
+      if (rand() < 0.1) emit('✨', headTop(-0.3).add(new THREE.Vector3((rand() - 0.5) * 1.2, 0, 0)), [0, 0.3, 0], 0.9, 0.25); } },
     happy: { dur: 2.0, face: { eye: 'happy', mouth: 'grin', blush: 0.7 }, fn(t, p, w) {
       const hop = Math.max(0, Math.sin(t * 2 * Math.PI * 1.25));
       p.pos[1] += hop * 0.18 * w; add(p, 'armL', 0, 0, 0.9 + hop * 0.6, w); add(p, 'armR', 0, 0, -0.9 - hop * 0.6, w); add(p, 'head', 0, 0, Math.sin(t * 6) * 0.1, w);
-      if (Math.random() < 0.08) emit('✨', headTop(0.1).add(new THREE.Vector3((Math.random() - 0.5) * 1.3, 0, 0)), [0, 0.5, 0], 1.0, 0.28); } },
+      if (rand() < 0.08) emit('✨', headTop(0.1).add(new THREE.Vector3((rand() - 0.5) * 1.3, 0, 0)), [0, 0.5, 0], 1.0, 0.28); } },
     excited: { dur: 2.0, face: { eye: 'wide', mouth: 'grin', open: 0.7, blush: 0.8 }, fn(t, p, w) {
       const hop = Math.abs(Math.sin(t * 2 * Math.PI * 2.2));
       p.pos[1] += hop * 0.22 * w; add(p, 'armL', 0, 0, 2.6, w); add(p, 'armR', 0, 0, -2.6, w); add(p, 'elbowL', 0, 0, Math.sin(t * 20) * 0.3, w); add(p, 'elbowR', 0, 0, -Math.sin(t * 20) * 0.3, w);
-      if (Math.random() < 0.1) emit('⭐', headTop(0.2).add(new THREE.Vector3((Math.random() - 0.5) * 1.4, 0, 0)), [0, 0.6, 0], 1.0, 0.3); } },
+      if (rand() < 0.1) emit('⭐', headTop(0.2).add(new THREE.Vector3((rand() - 0.5) * 1.4, 0, 0)), [0, 0.6, 0], 1.0, 0.3); } },
     watch: { dur: 2.6, face: { eye: 'normal', mouth: 'cat', lookX: 0.6, lookY: 0.9 }, fn(t, p, w) { // checks his smartwatch
       const k = pulse(t, 0, 2.3), s = spec.watch === 'right' ? 'R' : 'L', d = s === 'L' ? 1 : -1;
       add(p, 'arm' + s, -1.1, 0, -0.5 * d, k * w); add(p, 'elbow' + s, -1.5, 0.9 * d, 0, k * w); add(p, 'head', 0.35, 0.25 * d, 0, k * w); } },
@@ -597,17 +601,21 @@
   }
   function walkAcross() { const x = character.position.x; walkTo(x > 0 ? -0.9 : 0.9, 1.3, () => walkTo(0, 1.0, () => { facingTarget = 0; })); }
 
-  function enter() {
-    character.position.x = -3.4; facing = facingTarget = Math.PI / 2;
-    walkTo(0, 1.7, () => { facingTarget = 0; setTimeout(() => play(Math.random() < 0.5 ? 'wave' : 'namaste'), 350); });
+  function enter(opts) {
+    opts = opts || {};
+    const from = opts.from === undefined ? -3.4 : opts.from;
+    character.position.x = from; facing = facingTarget = from < 0 ? Math.PI / 2 : -Math.PI / 2;
+    walkTo(0, opts.dur || 1.7, () => { facingTarget = 0; if (opts.greet !== false) later(0.35, () => play(opts.greet || (rand() < 0.5 ? 'wave' : 'namaste'))); });
   }
 
   // ------------------------------------------------------------------ main loop
   const clock = new THREE.Clock();
   let tAll = 0;
-  function frame() {
-    requestAnimationFrame(frame);
-    const dt = Math.min(0.05, clock.getDelta()); tAll += dt;
+  const timers = [];
+  function later(d, fn) { timers.push({ t: tAll + d, fn }); }
+  function step(dt) {
+    tAll += dt;
+    for (let i = timers.length - 1; i >= 0; i--) if (tAll >= timers[i].t) { const f = timers[i].fn; timers.splice(i, 1); f(); }
     if (!character) return;
     const p = blankPose();
 
@@ -652,21 +660,26 @@
     }
 
     // random idle fidgets
-    if (!action && !talking && !thinking && !listening && !walking) {
+    if (!MANUAL && !action && !talking && !thinking && !listening && !walking) {
       idleTimer += dt;
-      if (idleTimer > 9 + Math.random() * 6) { idleTimer = 0; play(['watch', 'stretch', 'yes', 'shy', 'happy', 'think'][Math.floor(Math.random() * 6)]); }
+      if (idleTimer > 9 + rand() * 6) { idleTimer = 0; play(['watch', 'stretch', 'yes', 'shy', 'happy', 'think'][Math.floor(rand() * 6)]); }
     }
 
     // blink
     blinkTimer -= dt;
     if (blinkTimer <= 0 && blinkPhase < 0) blinkPhase = 0;
-    if (blinkPhase >= 0) { blinkPhase += dt; face.blink = Math.sin(Math.min(1, blinkPhase / 0.14) * Math.PI); if (blinkPhase > 0.14) { blinkPhase = -1; face.blink = 0; blinkTimer = 2 + Math.random() * 3.5; } }
+    if (blinkPhase >= 0) { blinkPhase += dt; face.blink = Math.sin(Math.min(1, blinkPhase / 0.14) * Math.PI); if (blinkPhase > 0.14) { blinkPhase = -1; face.blink = 0; blinkTimer = 2 + rand() * 3.5; } }
     // eyes follow the touch / wander
     if (face.lookX === undefined || (!action && !thinking)) { face.lookX = lookTarget.x + Math.sin(tAll * 0.7) * 0.15; face.lookY = lookTarget.y; }
 
     apply(p);
     drawFace();
     stepParticles(dt);
+  }
+  function frame() {
+    if (MANUAL) return;
+    requestAnimationFrame(frame);
+    step(Math.min(0.05, clock.getDelta()));
     renderer.render(scene, camera);
   }
 
@@ -701,7 +714,7 @@
     const local = B.head.worldToLocal(hit.point.clone());
     const onHead = local.y > 0.75;
     const r = onHead ? ['love', 'shy', 'happy'] : ['laugh', 'surprised', 'jump', 'spin', 'happy', 'shy'];
-    play(r[Math.floor(Math.random() * r.length)]);
+    play(r[Math.floor(rand() * r.length)]);
     if (window.Android && Android.onPoke) Android.onPoke(onHead ? 'head' : 'body');
   });
 
@@ -720,7 +733,35 @@
       try { const s = typeof json === 'string' ? JSON.parse(json) : json; spec = deepMerge(JSON.parse(JSON.stringify(DEFAULT_SPEC)), s); build(); } catch (e) { console.log('bad spec', e); }
     },
     actions: () => Object.keys(A).concat(['walk']),
+    /** Director mode: buddy.director([{at:0, enter:{greet:'wave'}}, {at:2, talk:true}, {at:5, play:'thumbsup'}]) */
+    director(events) { schedule = (events || []).slice().sort((a, b) => a.at - b.at); resetSim(); },
+    /** Render the exact frame for time t (seconds since the director timeline started). */
+    renderAt(t) {
+      const STEP = 1 / 60;
+      if (t < simT - 1e-6) resetSim();
+      while (simT + STEP <= t + 1e-6) {
+        while (schedIdx < schedule.length && schedule[schedIdx].at <= simT + 1e-6) runEvent(schedule[schedIdx++]);
+        step(STEP); simT += STEP;
+      }
+      renderer.render(scene, camera);
+    },
   };
+  let schedule = [], simT = 0, schedIdx = 0;
+  function resetSim() {
+    tAll = 0; simT = 0; schedIdx = 0; seed = 1234567;
+    action = null; actionT = 0; talking = thinking = listening = false;
+    walkTarget = null; walkDone = null; facing = facingTarget = 0; idleTimer = 0; blinkTimer = 2; blinkPhase = -1;
+    timers.length = 0; particles.forEach(q => scene.remove(q.s)); particles.length = 0;
+    if (character) character.position.set(0, 0, 0);
+  }
+  function runEvent(e) {
+    if (e.enter) enter(e.enter === true ? {} : e.enter);
+    if (e.play) play(e.play);
+    if ('talk' in e) talking = !!e.talk;
+    if ('think' in e) thinking = !!e.think;
+    if ('listen' in e) listening = !!e.listen;
+    if ('face' in e) facingTarget = e.face;
+  }
   function deepMerge(a, b) { for (const k in b) { if (b[k] && typeof b[k] === 'object' && !Array.isArray(b[k]) && a[k] && typeof a[k] === 'object') deepMerge(a[k], b[k]); else a[k] = b[k]; } return a; }
 
   build();
@@ -728,5 +769,5 @@
   const qs = new URLSearchParams(location.search);
   if (window.Android && Android.onReady) Android.onReady();
   else if (qs.get('act')) { setTimeout(() => play(qs.get('act')), 50); if (qs.get('talk')) talking = true; }
-  else enter();
+  else if (!MANUAL) enter();
 })();

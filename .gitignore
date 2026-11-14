@@ -9,3 +9,4 @@ shots/
 restore-debloat-*.sh
 approved.txt
 .DS_Store
+brag-output*/
