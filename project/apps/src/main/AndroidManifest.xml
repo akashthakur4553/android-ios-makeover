@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.telephony" android:required="false" />
+
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" tools:ignore="ScopedStorage" />
+    <uses-permission android:name="android.permission.READ_CALENDAR" />
+    <uses-permission android:name="android.permission.WRITE_CALENDAR" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+    <uses-permission android:name="android.permission.WRITE_CONTACTS" />
+    <uses-permission android:name="android.permission.READ_CALL_LOG" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+    <uses-permission android:name="android.permission.READ_SMS" />
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <uses-permission android:name="android.permission.TURN_SCREEN_ON" />
+
+    <application
+        android:name=".GlassAppsApp"
+        android:label="Glass Apps"
+        android:icon="@mipmap/ic_photos"
+        android:supportsRtl="true"
+        android:requestLegacyExternalStorage="true"
+        android:theme="@style/Theme.GlassApps"
+        tools:targetApi="35">
+
+        <activity android:name=".photos.PhotosActivity" android:exported="true" android:label="Photos"
+            android:icon="@mipmap/ic_photos" android:taskAffinity="com.glass.apps.photos" android:launchMode="singleTask" android:screenOrientation="portrait">
+            <intent-filter><action android:name="android.intent.action.MAIN" /><category android:name="android.intent.category.LAUNCHER" /></intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="image/*" />
+                <data android:mimeType="video/*" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".camera.CameraActivity" android:exported="true" android:label="Camera"
+            android:icon="@mipmap/ic_camera" android:taskAffinity="com.glass.apps.camera" android:launchMode="singleTask"
+            android:screenOrientation="portrait" android:theme="@style/Theme.GlassApps.Black">
+            <intent-filter><action android:name="android.intent.action.MAIN" /><category android:name="android.intent.category.LAUNCHER" /></intent-filter>
+            <intent-filter>
+                <action android:name="android.media.action.STILL_IMAGE_CAMERA" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".clock.ClockActivity" android:exported="true" android:label="Clock"
+            android:icon="@mipmap/ic_clock" android:taskAffinity="com.glass.apps.clock" android:launchMode="singleTask" android:screenOrientation="portrait">
+            <intent-filter><action android:name="android.intent.action.MAIN" /><category android:name="android.intent.category.LAUNCHER" /></intent-filter>
+        </activity>
+        <activity android:name=".clock.AlarmRingActivity" android:exported="false" android:showWhenLocked="true"
+            android:turnScreenOn="true" android:launchMode="singleInstance" android:excludeFromRecents="true"
+            android:taskAffinity="com.glass.apps.alarm" android:theme="@style/Theme.GlassApps.Black" />
+        <receiver android:name=".clock.AlarmReceiver" android:exported="false" />
+        <receiver android:name=".clock.BootReceiver" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+
+        <activity android:name=".calendar.CalendarActivity" android:exported="true" android:label="Calendar"
+            android:icon="@mipmap/ic_calendar" android:taskAffinity="com.glass.apps.calendar" android:launchMode="singleTask" android:screenOrientation="portrait">
+            <intent-filter><action android:name="android.intent.action.MAIN" /><category android:name="android.intent.category.LAUNCHER" /></intent-filter>
+        </activity>
+
+        <activity android:name=".contacts.PhoneActivity" android:exported="true" android:label="Phone"
+            android:icon="@mipmap/ic_phone" android:taskAffinity="com.glass.apps.phone" android:launchMode="singleTask" android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter><action android:name="android.intent.action.MAIN" /><category android:name="android.intent.category.LAUNCHER" /></intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.DIAL" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="tel" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".contacts.ContactsActivity" android:exported="true" android:label="Contacts"
+            android:icon="@mipmap/ic_contacts" android:taskAffinity="com.glass.apps.contacts" android:launchMode="singleTask" android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter><action android:name="android.intent.action.MAIN" /><category android:name="android.intent.category.LAUNCHER" /></intent-filter>
+        </activity>
+
+        <activity android:name=".music.MusicActivity" android:exported="true" android:label="Music"
+            android:icon="@mipmap/ic_music" android:taskAffinity="com.glass.apps.music" android:launchMode="singleTask" android:screenOrientation="portrait">
+            <intent-filter><action android:name="android.intent.action.MAIN" /><category android:name="android.intent.category.LAUNCHER" /></intent-filter>
+        </activity>
+        <service android:name=".music.MusicService" android:exported="true" android:foregroundServiceType="mediaPlayback">
+            <intent-filter><action android:name="androidx.media3.session.MediaSessionService" /></intent-filter>
+        </service>
+
+        <activity android:name=".files.FilesActivity" android:exported="true" android:label="Files"
+            android:icon="@mipmap/ic_files" android:taskAffinity="com.glass.apps.files" android:launchMode="singleTask" android:screenOrientation="portrait">
+            <intent-filter><action android:name="android.intent.action.MAIN" /><category android:name="android.intent.category.LAUNCHER" /></intent-filter>
+        </activity>
+
+        <activity android:name=".messages.MessagesActivity" android:exported="true" android:label="Messages"
+            android:icon="@mipmap/ic_messages" android:taskAffinity="com.glass.apps.messages" android:launchMode="singleTask" android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter><action android:name="android.intent.action.MAIN" /><category android:name="android.intent.category.LAUNCHER" /></intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SENDTO" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="sms" />
+                <data android:scheme="smsto" />
+            </intent-filter>
+        </activity>
+
+        <provider android:name="androidx.core.content.FileProvider" android:authorities="com.glass.apps.files"
+            android:exported="false" android:grantUriPermissions="true">
+            <meta-data android:name="android.support.FILE_PROVIDER_PATHS" android:resource="@xml/file_paths" />
+        </provider>
+    </application>
+</manifest>

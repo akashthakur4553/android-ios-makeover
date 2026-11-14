@@ -1,0 +1,10 @@
+# ---- vivo / iQOO (Funtouch OS, OriginOS) ----
+com.vivo.magazine                  # Lock-screen magazine (ads)                       [safe]
+com.vivo.hiboard                   # Jovi smart (left screen)                         [optional]
+com.vivo.assistant                 # Jovi assistant                                   [optional]
+com.vivo.browser                   # vivo browser (ads)                               [optional]
+com.vivo.appstore                  # V-Appstore (pushes apps)                         [optional]
+com.vivo.easyshare                 # EasyShare                                        [optional]
+com.vivo.game                      # Game center                                      [optional]
+com.vivo.website                   # vivo.com shortcut                                [safe]
+com.vivo.videoeditor               # Video editor                                     [optional]

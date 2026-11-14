@@ -1,0 +1,3 @@
+<resources>
+    <string name="island_desc">Shows an iPhone-style Dynamic Island around the camera and lets you swipe down from the top-right corner to open Glass Control Centre. It also powers the iPhone-style app switcher: it notes which app is open and keeps a small snapshot in memory for the switcher cards (never saved, never sent anywhere). It does not read text or content inside your apps.</string>
+</resources>

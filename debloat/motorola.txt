@@ -1,0 +1,5 @@
+# ---- Motorola ----
+com.motorola.ccc.notification      # Moto promotional notifications                   [safe]
+com.motorola.help                  # Help                                             [optional]
+com.motorola.demo                  # Retail demo                                      [safe]
+com.motorola.moto                  # Moto app (gestures settings live here!)          [optional]
