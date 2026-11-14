@@ -127,6 +127,7 @@ class BuddyActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         cfg = BuddyConfig(this)
         applySetupExtras(intent)
+        if (floatInstead(intent)) { finish(); overridePendingTransition(0, 0); return }
         WindowCompat.setDecorFitsSystemWindows(window, false)
         window.addFlags(WindowManager.LayoutParams.FLAG_DIM_BEHIND)
         window.setDimAmount(0f)
@@ -141,7 +142,7 @@ class BuddyActivity : ComponentActivity() {
             if (ttsReady) {
                 val loc = Locale("en", "IN")
                 if (tts?.isLanguageAvailable(loc) ?: -1 >= TextToSpeech.LANG_AVAILABLE) tts?.language = loc
-                tts?.setPitch(cfg.pitch); tts?.setSpeechRate(1.02f)
+                tts?.let { BuddyBrain.applyVoice(it, cfg.pitch) }
                 tts?.setOnUtteranceProgressListener(object : UtteranceProgressListener() {
                     override fun onStart(id: String?) = js("buddy.setTalking(true)")
                     override fun onDone(id: String?) {
@@ -161,6 +162,20 @@ class BuddyActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         applySetupExtras(intent)
+        if (floatInstead(intent)) { finish(); overridePendingTransition(0, 0) }
+    }
+
+    /** Default: float Buddy over whatever app is open (full-screen chat only on double-tap or if the island isn't running). */
+    private fun floatInstead(i: Intent): Boolean {
+        if (i.getBooleanExtra("chat", false) || checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) return false
+        val isl = IslandService.instance ?: return false
+        val q = i.getStringExtra("ask"); val a = i.getStringExtra("play")
+        isl.showBuddy(greet = q == null && a == null)
+        // demo/automation hooks: --es ask "question"  /  --es play dance
+        val h = android.os.Handler(android.os.Looper.getMainLooper())
+        if (q != null) h.postDelayed({ isl.buddy?.ask(q) }, 400)
+        if (a != null) h.postDelayed({ isl.buddy?.play(a) }, 200)
+        return true
     }
 
     /** adb / skill setup:  am start -n com.glass.launcher/.buddy.BuddyActivity --es setup_provider Gemini --es setup_key KEY ... */
@@ -174,6 +189,7 @@ class BuddyActivity : ComponentActivity() {
         // fallback provider (used automatically when the main one fails)
         val fb = i.getStringExtra("setup_fallback_provider")?.let { p -> runCatching { Provider.valueOf(p) }.getOrNull() }
         if (fb != null) { i.getStringExtra("setup_fallback_key")?.let { cfg.setKey(fb, it) }; i.getStringExtra("setup_fallback_model")?.let { cfg.setModel(fb, it) } }
+        if (i.hasExtra("demo")) getSharedPreferences("buddy", MODE_PRIVATE).edit().putBoolean("demo", i.getBooleanExtra("demo", false)).apply()
         i.getStringExtra("setup_spec_b64")?.let { runCatching { cfg.spec = String(Base64.decode(it, Base64.DEFAULT)) } }
     }
 
@@ -296,7 +312,12 @@ class BuddyActivity : ComponentActivity() {
                     settings.javaScriptEnabled = true
                     settings.domStorageEnabled = true
                     settings.mediaPlaybackRequiresUserGesture = false
-                    webChromeClient = WebChromeClient()
+                    WebView.setWebContentsDebuggingEnabled(true)
+                    webChromeClient = object : WebChromeClient() {
+                        override fun onConsoleMessage(m: android.webkit.ConsoleMessage): Boolean {
+                            android.util.Log.i("BuddyJS", "${m.messageLevel()} ${m.sourceId()?.substringAfterLast('/')}:${m.lineNumber()} ${m.message()}"); return true
+                        }
+                    }
                     addJavascriptInterface(Bridge(), "Android")
                     loadUrl("file:///android_asset/buddy/index.html")
                     web = this

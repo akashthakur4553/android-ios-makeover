@@ -1,7 +1,8 @@
 # Buddy — the user's 3D cartoon assistant
 
 Buddy is a cute chibi 3D version of the user, built **procedurally with three.js** (no paid 3D services,
-no downloads). It opens on **long-press Home** (Buddy is set as the phone's digital assistant), walks in,
+no downloads). It **floats on top of any app like a chat head** — the app underneath stays fully usable.
+It appears on **long-press Home** (Buddy is set as the phone's digital assistant), walks in,
 greets the user by voice, listens (Android speech recognition), thinks with **any LLM provider**, can look
 at the screen (screenshot via the Glass accessibility service), and answers out loud with matching
 emotions and moves: wave, namaste, talk, walk, laugh, cry, sad, angry, surprised, think, love, shy,
@@ -9,6 +10,27 @@ sleepy, dance, jump, clap, thumbs-up, yes, no, spin, excited, check-watch, stret
 
 Files: `project/app/src/main/assets/buddy/` (three.js engine + `buddy.js`), `project/app/.../buddy/` (Android: `BuddyActivity`, `Llm.kt`).
 Preview the character on a computer: open `project/app/src/main/assets/buddy/index.html?act=wave` in Chrome.
+
+## How the user controls him
+* **Long-press Home** (or the Buddy icon) → floating Buddy walks in and greets.
+* **Tap him** → he listens (speech recognition); ask anything. Say "what's on my screen?" and he looks.
+* **Drag him** anywhere. **Drag onto the ✕** at the bottom to hide him.
+* **Double-tap him** → full chat screen (type messages, settings: provider, key, model, name, screen-peeking on/off).
+* The speech bubble is a separate *non-touchable* window, so it never blocks the app below.
+* Voice: a deep male Google voice by default (`BuddyBrain.applyVoice` picks `en-in-x-end` / `en-us-x-iom` / `en-us-x-iol` / `en-us-x-tpd`, pitch 0.82). For a female voice, change the preferred list (e.g. `en-us-x-tpc`, `en-in-x-ena`) and pitch ~1.1.
+
+## Architecture (for changing it)
+* `assets/buddy/buddy.js` — the character + 20+ animations; `buddy.play(name)`, `setTalking/Thinking/Listening`, `setSpec(json)`, `enter()`.
+* `buddy/BuddyBrain.kt` — TTS/STT, LLM call with **provider fallback**, emotion tags, screenshot on demand.
+* `buddy/BuddyOverlay.kt` — the floating windows (WebView character, bubble, ✕ target), drag/tap/double-tap.
+* `buddy/Llm.kt` — providers (Gemini native, Anthropic native, everything else OpenAI-compatible). `chain()` = provider in use first, then every other provider with a key; on failure/rate-limit it moves on and **sticks** with the one that works.
+* Hosted by the Glass accessibility service (`IslandService.showBuddy()`), which can draw above other apps and take the screenshot. `BuddyActivity` is only the entry point (long-press Home) and the full chat screen.
+
+### Gotchas we hit (keep these)
+* In an Android WebView the page `<body>` can measure **0 px tall** → a canvas inside it is clipped to nothing. The canvas is `position:fixed` full-size when hosted in `<body>`.
+* `adb shell am start --es ask 'a b c'` — wrap the whole command in quotes, or the phone's shell splits the text and only "a" arrives.
+* Posting work on a closing Activity's view drops it; use `Handler(Looper.getMainLooper())`.
+* `screenrecord` on many phones can't encode full resolution (use `--size 720x1640`) and **does not record audio**; stop it with its `--time-limit` (killing it leaves a 0-byte file).
 
 ## 1. Ask the user (required)
 1. **A full-body photo** (front, standing) — a face-only photo works but the agent must guess the outfit.
@@ -71,7 +93,13 @@ Models: Gemini default `gemini-2.5-flash` (fast); Groq default `openai/gpt-oss-1
 * OpenAI-compatible: `curl -s $BASE/models -H "Authorization: Bearer $KEY"`
 The user can change everything later in Buddy → ⚙.
 
-## 5. Verify
+## 5. Automation / demo hooks
+* `adb shell "am start -n com.glass.launcher/.buddy.BuddyActivity --es ask 'what is on my screen?'"` — ask a question (as if spoken).
+* `adb shell "am start -n com.glass.launcher/.buddy.BuddyActivity --es play dance"` — play any action.
+* `--ez demo true` — also saves every spoken line (Buddy's voice + a second voice reading the question) as timestamped WAVs in
+  `/sdcard/Android/data/com.glass.launcher/files/demo/` so you can build a demo video **with sound** (mux with ffmpeg, `adelay` each clip by `timestamp - recordingStart`). Turn off with `--ez demo false`.
+
+## 6. Verify
 * Long-press Home (or open the "Buddy" app): he walks in and greets by voice.
 * Ask "what's on my screen?" from inside another app → he describes it (needs a vision-capable model).
 * Ask him to dance / jump / tell a joke → matching animation + voice.

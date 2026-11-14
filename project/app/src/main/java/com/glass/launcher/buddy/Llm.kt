@@ -45,7 +45,7 @@ class BuddyConfig(ctx: Context) {
     var name: String get() = sp.getString("name", "") ?: ""; set(v) = sp.edit().putString("name", v.trim()).apply()
     var seeScreen: Boolean get() = sp.getBoolean("seeScreen", true); set(v) = sp.edit().putBoolean("seeScreen", v).apply()
     var keepListening: Boolean get() = sp.getBoolean("keepListening", true); set(v) = sp.edit().putBoolean("keepListening", v).apply()
-    var pitch: Float get() = sp.getFloat("pitch", 1.12f); set(v) = sp.edit().putFloat("pitch", v).apply()
+    var pitch: Float get() = sp.getFloat("pitch", 0.82f); set(v) = sp.edit().putFloat("pitch", v).apply()
     var spec: String get() = sp.getString("spec", "") ?: ""; set(v) = sp.edit().putString("spec", v).apply()
     val ready get() = chain().isNotEmpty()
 }
@@ -76,9 +76,10 @@ You cannot tap, open apps or change settings on the phone; if asked, say so kind
                 val r = try { call(cfg, p, history, screenshotJpeg) }
                         catch (e: Exception) { if (screenshotJpeg != null) call(cfg, p, history, null) else throw e }
                 if (r.isBlank()) throw IllegalStateException("empty reply")
+                android.util.Log.i("BuddyLLM", "answered by $p (image=${screenshotJpeg != null})")
                 cfg.markActive(p)
                 return r
-            } catch (e: Exception) { last = e }
+            } catch (e: Exception) { last = e; android.util.Log.w("BuddyLLM", "$p failed: ${e.message?.take(160)}") }
         }
         throw last ?: IllegalStateException("No AI provider set up")
     }

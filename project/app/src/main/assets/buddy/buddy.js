@@ -23,7 +23,8 @@
 
   // ------------------------------------------------------------------ renderer / scene
   const host = window.BUDDY_HOST || document.body;
-  const W = () => host.clientWidth || innerWidth, Hh = () => host.clientHeight || innerHeight;
+  const isBody = host === document.body;
+  const W = () => (isBody ? innerWidth : host.clientWidth) || innerWidth, Hh = () => (isBody ? innerHeight : host.clientHeight) || innerHeight;
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   renderer.setSize(W(), Hh());
@@ -31,6 +32,7 @@
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   host.appendChild(renderer.domElement);
+  if (isBody) renderer.domElement.style.cssText = 'position:fixed;left:0;top:0;width:100%;height:100%;'; // never clipped by a 0-height body
 
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(28, W() / Hh(), 0.1, 100);

@@ -340,6 +340,13 @@ class IslandService : AccessibilityService(), LifecycleOwner, SavedStateRegistry
         cover?.let { runCatching { wm.removeViewImmediate(it) } }; cover = null
     }
 
+    /** Floating Buddy companion (lives above every app). */
+    var buddy: com.glass.launcher.buddy.BuddyOverlay? = null
+    fun showBuddy(greet: Boolean = true) {
+        if (buddy == null) buddy = com.glass.launcher.buddy.BuddyOverlay(this, wm, WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY) { cb -> captureScreen(cb) }
+        buddy?.show(greet)
+    }
+
     /** One-off full-screen capture for Buddy ("see my screen"). Returns a software bitmap (or null). */
     fun captureScreen(cb: (android.graphics.Bitmap?) -> Unit) {
         if (android.os.Build.VERSION.SDK_INT < 30) { cb(null); return }
@@ -412,6 +419,7 @@ class IslandService : AccessibilityService(), LifecycleOwner, SavedStateRegistry
     }
 
     private fun teardown() {
+        runCatching { buddy?.hide() }; buddy = null
         instance = null
         hideCover()
         setSystemHeadsUp(true)
