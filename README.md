@@ -8,6 +8,8 @@ Plug an Android phone into your computer, point your AI coding agent (Claude Cod
 4. **Block ads in every app and browser** (Private DNS).
 5. **Install "Glass"** — an iPhone-style launcher: Liquid Glass dock & widgets, folders, jiggle-mode editing, App Library, Today View, Spotlight, Control Centre, Notification Centre, **Dynamic Island**, iOS-style banners and app switcher — plus iOS-style **Photos, Camera, Clock, Calendar, Phone, Contacts, Messages, Music, Files**.
 
+6. **Buddy** (optional) — a cute 3D cartoon *you*, generated from your photo with open-source three.js, that pops up on long-press Home, greets you by voice, talks with any AI (Gemini, Groq, OpenRouter, OpenAI, Claude, local…, with automatic fallback between free keys), sees your screen, and acts out emotions: laugh, cry, dance, jump, wave and more.
+
 Everything is reversible, the phone's original launcher and apps stay installed as a fallback, and Glass automatically falls back to the stock launcher if it ever crashes.
 
 > Glass is an original, iOS-*inspired* design — it doesn't ship Apple's icons, fonts or artwork.

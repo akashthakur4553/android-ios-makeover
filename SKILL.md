@@ -1,6 +1,6 @@
 ---
 name: android-ios-makeover
-description: Turn any Android phone connected over USB (ADB) into a clean, fast, iPhone-like device — security/spyware audit, user-approved debloat, privacy hardening, speed-up (incl. old phones), system-wide ad blocking, and install "Glass" (an iOS-style launcher with Liquid Glass, Dynamic Island, Control/Notification Centre, Spotlight, App Library, app switcher) plus iOS-style Photos, Camera, Clock, Calendar, Phone, Contacts, Messages, Music and Files apps. Everything is reversible and the phone's stock launcher/apps stay as a fallback. Use when a user says things like "clean my phone", "remove bloatware", "is my phone hacked", "make my phone faster", "block ads on my phone", "make my Android look like an iPhone".
+description: Turn any Android phone connected over USB (ADB) into a clean, fast, iPhone-like device (plus an optional cute 3D cartoon assistant of the user, made from their photo, on long-press Home) — security/spyware audit, user-approved debloat, privacy hardening, speed-up (incl. old phones), system-wide ad blocking, and install "Glass" (an iOS-style launcher with Liquid Glass, Dynamic Island, Control/Notification Centre, Spotlight, App Library, app switcher) plus iOS-style Photos, Camera, Clock, Calendar, Phone, Contacts, Messages, Music and Files apps. Everything is reversible and the phone's stock launcher/apps stay as a fallback. Use when a user says things like "clean my phone", "remove bloatware", "is my phone hacked", "make my phone faster", "block ads on my phone", "make my Android look like an iPhone".
 ---
 
 # Android → iPhone-style makeover (Glass)
@@ -155,12 +155,22 @@ Then it grants permissions, enables the Notification listener + the "Glass Dynam
 * Screens < 360dp wide or tablets: grid is fixed 4×6; widgets resize. If icons look cramped, Glass Settings → turn off app names.
 * Old/slow GPU (see `reference/old-phones.md`): Glass Settings → **Liquid Glass Refraction OFF** (dock uses plain frosted glass).
 
+## Phase 8b — Buddy, their 3D cartoon assistant (optional, ask first)
+
+Offer it: "Want a cute 3D cartoon version of you that pops up on long-press Home, talks, and can see your screen?"
+If yes, follow `reference/buddy-avatar.md` exactly:
+1. **Ask** for a full-body photo, their AI provider + key (any provider, free or paid; suggest a free fallback such as Groq), and the name to call them.
+2. **Look at the photo yourself** and write the avatar spec JSON (skin, hair style/colour, clothes, accessories). Preview it in Chrome and let them give feedback before installing. Keep it cute.
+3. `BUDDY_KEY=... BUDDY_FALLBACK=Groq BUDDY_FALLBACK_KEY=... project/buddy-setup.sh <Provider> "" buddy-spec.json "<Name>"` — keys go only to the phone. Never write keys to files or commits.
+4. Verify long-press Home opens Buddy, he greets by voice, answers with emotions, and (with a vision model) describes the screen.
+
 ## Phase 9 — Hand-over
 
 Tell the user (short):
 * What changed (counts: apps removed, MB freed, DNS provider, Glass installed).
 * **How to go back to the original launcher**: Glass Settings → *Switch back to original launcher*, or phone Settings → Apps → Default apps → Home app → (stock launcher). Full undo: `bash scripts/08_revert.sh`.
 * Safety: if Glass crashes it opens the stock launcher automatically; after 3 crashes in 2 minutes it steps aside entirely.
+* Buddy (if installed): long-press Home, talk to him, tap the eye icon to stop screen-peeking, ⚙ to change provider/key.
 * Gestures cheat-sheet: swipe down (middle) Spotlight · top-right Control Centre · top-left Notification Centre · long-press icon menu · long-press empty space edit mode · swipe left from page 1 Today View · swipe right past last page App Library · tap/long-press/swipe the Dynamic Island.
 
 ---

@@ -340,6 +340,22 @@ class IslandService : AccessibilityService(), LifecycleOwner, SavedStateRegistry
         cover?.let { runCatching { wm.removeViewImmediate(it) } }; cover = null
     }
 
+    /** One-off full-screen capture for Buddy ("see my screen"). Returns a software bitmap (or null). */
+    fun captureScreen(cb: (android.graphics.Bitmap?) -> Unit) {
+        if (android.os.Build.VERSION.SDK_INT < 30) { cb(null); return }
+        runCatching {
+            takeScreenshot(android.view.Display.DEFAULT_DISPLAY, mainExecutor, object : TakeScreenshotCallback {
+                override fun onSuccess(r: ScreenshotResult) {
+                    val bmp = runCatching {
+                        android.graphics.Bitmap.wrapHardwareBuffer(r.hardwareBuffer, r.colorSpace)?.copy(android.graphics.Bitmap.Config.ARGB_8888, false)
+                    }.getOrNull()
+                    r.hardwareBuffer.close(); cb(bmp)
+                }
+                override fun onFailure(errorCode: Int) = cb(null)
+            })
+        }.onFailure { cb(null) }
+    }
+
     /** Small, in-memory snapshot of the app in front, for the switcher card. */
     private fun snapshot(pkg: String) {
         if (android.os.Build.VERSION.SDK_INT < 30) return
